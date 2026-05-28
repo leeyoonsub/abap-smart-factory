@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABAP Smart Factory - IoT Cockpit Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Background Dolphin Pod Aquarium -->
+    <div id="dolphin-aquarium" class="dolphin-aquarium"></div>
+
+    <!-- Header Navigation -->
+    <header class="app-header glass-panel">
+        <div class="logo-container">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 15v3c0 .55-.45 1-1 1h-2v-4h3m-7 4v-4h2v4h-2m-4 0v-4h2v4H8M4 18v-3h3v4H5c-.55 0-1-.45-1-1m8-11L4 12v1h16v-1l-8-5m8 10v-3h-3v4h2c.55 0 1-.45 1-1M4 14v3c0 .55.45 1 1 1h2v-4H4m7 4v-4H9v4h2m4 0v-4h-2v4h2Z"/>
+                </svg>
+            </div>
+            <div>
+                <span class="logo-title">ABAP Smart Factory</span>
+                <span style="font-size: 10px; color: var(--text-muted); display: block; margin-top: -2px;">SAP Industrial IoT Integration</span>
+            </div>
+        </div>
+        
+        <div class="system-status-indicator">
+            <div id="status-dot" class="status-dot"></div>
+            <span id="status-text">RUNNING (ONLINE)</span>
+            <span class="badge active-badge" style="background: rgba(0, 242, 254, 0.12); color: var(--neon-blue); padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 11px; margin-left: 8px;">SAP DEV-900</span>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Workspace -->
+    <div class="main-layout">
+        
+        <!-- Right Column (now Left Column: SAP Integration Hub & ABAP Code) -->
+        <div class="glass-panel integration-pane" style="padding: 24px;">
+            
+            <!-- Active SAP Orders -->
+            <div class="glass-card sap-orders-card" style="padding: 20px;">
+                <h3 class="section-title">SAP PP Production Orders</h3>
+                <div id="orders-list" class="orders-list">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- ABAP Integration Code tabs -->
+            <div class="glass-card code-tabs-card" style="padding: 20px;">
+                <h3 class="section-title">SAP ABAP Integration Logic</h3>
+                <div class="tabs-header">
+                    <button class="tab-btn active" data-tab="rfc_sensor">📡 Telemetry RFC</button>
+                    <button class="tab-btn" data-tab="bapi_goods">📦 Goods Issue BAPI</button>
+                    <button class="tab-btn" data-tab="bapi_conf">✅ Confirm Order BAPI</button>
+                </div>
+                
+                <pre class="code-viewer-container"><code id="code-viewer"><!-- Highlighted ABAP code --></code></pre>
+            </div>
+
+        </div>
+
+        <!-- Left Column (now Right Column: Cockpit & Telemetry) -->
+        <div class="scroll-pane">
+            
+            <!-- Cockpit Main Group Container -->
+            <div class="glass-panel cockpit-group-wrapper" style="padding: 24px; display: flex; flex-direction: column; gap: 24px; margin-bottom: 4px;">
+                
+                <!-- Overall Metrics Gauge Panel -->
+                <div>
+                    <div class="section-header">
+                        <h3 class="section-title">Factory Overview</h3>
+                    </div>
+                    <div class="glass-card overall-metrics-grid" style="padding: 20px;">
+                        <div class="metric-card">
+                            <span id="val-oee" class="metric-value">88.4%</span>
+                            <span class="metric-label">OEE (Overall Efficiency)</span>
+                        </div>
+                        <div class="metric-card">
+                            <span id="val-prod-rate" class="metric-value">140/H</span>
+                            <span class="metric-label">Production Yield Rate</span>
+                        </div>
+                        <div class="metric-card">
+                            <span id="val-defect-rate" class="metric-value">0.8%</span>
+                            <span class="metric-label">QA Reject Defect Rate</span>
+                        </div>
+                        <div class="metric-card" style="align-items: stretch; text-align: left; padding: 4px 10px;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom: 6px;">
+                                <span class="metric-label">Active Order Qty</span>
+                                <span id="val-progress" class="sensor-value" style="color:var(--neon-blue);">64%</span>
+                            </div>
+                            <div class="progress-track" style="height: 6px;">
+                                <div id="progress-bar" class="progress-fill" style="width: 64%;"></div>
+                            </div>
+                            <span style="font-size:10px; color:var(--text-muted); display:block; margin-top:8px; text-align:center;">Real-time SAP database progress</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Machine Telemetry Cards -->
+                <div>
+                    <div class="section-header">
+                        <h3 class="section-title">Machine Telemetry (OPC UA Channels)</h3>
+                    </div>
+                    <div class="telemetry-grid">
+                        <!-- Machine 1 -->
+                        <div class="glass-card machine-card" style="padding: 16px;">
+                            <div class="machine-card-header">
+                                <span class="machine-name">🦾 Robotic Assembly Arm</span>
+                                <span class="badge success" style="font-size:9px; background:rgba(16,185,129,0.12); color:var(--neon-green);">ACTIVE</span>
+                            </div>
+                            <div class="sensor-stats">
+                                <div class="sensor-row">
+                                    <span class="sensor-label">Temperature</span>
+                                    <span id="robot-temp" class="sensor-value">42.5°C</span>
+                                </div>
+                                <div class="sensor-row">
+                                    <span class="sensor-label">Vibration</span>
+                                    <span id="robot-vibra" class="sensor-value">1.2g</span>
+                                </div>
+                                <div class="sensor-row">
+                                    <span class="sensor-label">Load Capacity</span>
+                                    <span id="robot-speed" class="sensor-value">60%</span>
+                                </div>
+                            </div>
+                            <div class="progress-track">
+                                <div id="robot-fill" class="progress-fill" style="width: 60%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Machine 2 -->
+                        <div class="glass-card machine-card" style="padding: 16px;">
+                            <div class="machine-card-header">
+                                <span class="machine-name">⚙️ CNC Mill Unit</span>
+                                <span class="badge success" style="font-size:9px; background:rgba(16,185,129,0.12); color:var(--neon-green);">ACTIVE</span>
+                            </div>
+                            <div class="sensor-stats">
+                                <div class="sensor-row">
+                                    <span class="sensor-label">Temperature</span>
+                                    <span id="cnc-temp" class="sensor-value">58.2°C</span>
+                                </div>
+                                <div class="sensor-row">
+                                    <span class="sensor-label">Vibration</span>
+                                    <span id="cnc-vibra" class="sensor-value">2.4g</span>
+                                </div>
+                                <div class="sensor-row">
+                                    <span class="sensor-label">Load Capacity</span>
+                                    <span id="cnc-speed" class="sensor-value">60%</span>
+                                </div>
+                            </div>
+                            <div class="progress-track">
+                                <div id="cnc-fill" class="progress-fill" style="width: 60%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Machine 3 -->
+                        <div class="glass-card machine-card" style="padding: 16px;">
+                            <div class="machine-card-header">
+                                <span class="machine-name">⛓️ Conveyor System</span>
+                                <span class="badge success" style="font-size:9px; background:rgba(16,185,129,0.12); color:var(--neon-green);">ACTIVE</span>
+                            </div>
+                            <div class="sensor-stats">
+                                <div class="sensor-row">
+                                    <span class="sensor-label">Temperature</span>
+                                    <span id="conveyor-temp" class="sensor-value">28.1°C</span>
+                                </div>
+                                <div class="sensor-row">
+                                    <span class="sensor-label">Vibration</span>
+                                    <span id="conveyor-vibra" class="sensor-value">0.8g</span>
+                                </div>
+                                <div class="sensor-row">
+                                    <span class="sensor-label">Belt Speed</span>
+                                    <span id="conveyor-speed" class="sensor-value">60%</span>
+                                </div>
+                            </div>
+                            <div class="progress-track">
+                                <div id="conv-fill" class="progress-fill" style="width: 60%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control & Console Group Container -->
+            <div class="glass-panel control-console-group-wrapper" style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+                <!-- Control Room Console -->
+                <div class="glass-card control-panel" style="margin: 0; background: rgba(255, 255, 255, 0.015);">
+                    <div class="control-group">
+                        <button id="btn-start" class="btn-ctrl active-start">▶ Start Production</button>
+                        <button id="btn-pause" class="btn-ctrl">⏸ Pause</button>
+                        <button id="btn-halt" class="btn-ctrl" style="border-radius: 8px;">⚠️ EMERGENCY HALT</button>
+                    </div>
+                    
+                    <div class="slider-container">
+                        <span class="sensor-label">Conveyor Target Speed:</span>
+                        <input type="range" id="speed-slider" class="speed-slider" min="0" max="100" value="60">
+                        <span id="speed-label" class="sensor-value" style="width:36px; display:inline-block;">60%</span>
+                    </div>
+                </div>
+
+                <!-- OPC UA Stream Console -->
+                <div class="glass-card console-card" style="padding: 14px; margin: 0; background: rgba(255, 255, 255, 0.015);">
+                    <h3 class="section-title" style="margin-bottom: 8px; font-size:11px;">OPC UA Telemetry Stream & SAP Integration Log</h3>
+                    <div id="console-body" class="console-body">
+                        <!-- Logs injected dynamically -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Emergency Overlay Alarm Screen -->
+    <div id="alarm-overlay" class="alarm-overlay"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
